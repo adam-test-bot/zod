@@ -178,6 +178,40 @@ await schema.safeParseAsync("hello");
 // => { success: true; data: "hello" }
 ```
 
+### Debugging tips & tricks
+
+Running into unexpected validation errors or type mismatches? Here are a few quick tricks that make tracking problems down a lot easier.
+
+- **Use `safeParse()` for non-throwing checks.** `safeParse` (and `safeParseAsync`) let you inspect the success / error object without setting up `try/catch` blocks every time.
+
+  ```ts
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    console.log(result.error.flatten());
+  }
+  ```
+
+- **Pretty-print errors with `flatten()` or `format()`.** `ZodError` has two helpers that turn a nested issue list into something more readable:
+
+  ```ts
+  err.flatten(); // → { fieldErrors: Record<string, string[]>, formErrors: string[] }
+  err.format(); // → recursive object mirroring your schema shape
+  ```
+
+- **Add descriptions to pinpoint failing fields.** Annotate tricky schema branches with `.describe()` — the `description` will show up in the error tree so you can instantly see which branch failed.
+
+  ```ts
+  const Config = z.object({
+    port: z.number().int().positive().describe("Server port"),
+  });
+  ```
+
+- **Quickly test a value with `is()` / `check()`.** Need a boolean “does this pass” test? Call `schema.is(value)` (sync) or `await schema.isAsync(value)`. If you want an early-throwing assertion, use `schema.check(value)`.
+
+- **Leverage TypeScript for type-level debugging.** When something feels “off”, temporarily hover the `z.infer<typeof YourSchema>` type or use the [`satisfies`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator) operator to verify that your inferred types line up with expectations.
+
+These helpers usually surface enough information to spot the root cause quickly. For more advanced patterns check the <https://zod.dev/api> docs search for “debugging”.
+
 ### Inferring types
 
 Zod infers a static type from your schema definitions. You can extract this type with the `z.infer<>` utility and use it however you like.
