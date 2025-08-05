@@ -206,3 +206,15 @@ type MySchemaIn = z.input<typeof mySchema>;
 type MySchemaOut = z.output<typeof mySchema>; // equivalent to z.infer<typeof mySchema>
 // number
 ```
+
+## Porting Zod to Python
+
+Zod’s core concepts are language-agnostic, and we’re kicking off an **experimental Python port**. If you’d like to help, here’s the minimal setup to get you moving:
+
+- Clone or fork this repo and create a fresh Python package (e.g. `zod_py/`).
+- Re-implement the **basics first**: a `ZodType` base class plus primitive schemas like `String`, `Number`, and `Boolean`.
+- Add a tiny test suite with **pytest** that mirrors the TypeScript examples in `packages/zod/src/v4/core/tests/`.
+- Stick closely to the public API & error shape, but embrace Python idioms (dataclasses, `typing`, async validations).
+- When you can successfully run `User.parse({...})` in Python, open a draft PR titled `[Python] Initial port` so we can review and coordinate next steps.
+
+Chat with the maintainers in the **#python-port** Discord channel if you get stuck. Happy hacking!
